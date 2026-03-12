@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinguaFlow — AI Translator</title>
+  <meta name="description" content="Translate text across 15 languages instantly with LinguaFlow — supports speech input, text-to-speech, file translation, and translation history." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ───────────────── NAVBAR ───────────────── -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand">
+      <div class="brand-icon">🌐</div>
+      <span class="brand-name">LinguaFlow</span>
+    </div>
+    <div class="nav-actions">
+      <button id="themeToggle" class="icon-btn" title="Toggle theme" aria-label="Toggle dark/light mode">
+        <span class="theme-icon">🌙</span>
+      </button>
+      <div id="guestActions">
+        <button class="btn btn-ghost" id="loginBtn">Login</button>
+        <button class="btn btn-primary" id="registerBtn">Sign Up</button>
+      </div>
+      <div id="userActions" class="hidden">
+        <div class="user-chip" id="userChip">
+          <div class="avatar" id="avatarEl"></div>
+          <span id="usernameDisplay"></span>
+        </div>
+        <button class="btn btn-ghost" id="dashboardBtn">Dashboard</button>
+        <button class="btn btn-ghost" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ───────────────── VIEWS ───────────────── -->
+  <main id="app">
+    <!-- ═══ HOME / TRANSLATE VIEW ═══ -->
+    <section id="homeView" class="view active">
+      <div class="hero">
+        <div class="hero-badge">✨ Powered by Neural Translation</div>
+        <h1 class="hero-title">Break Language<br/><span class="gradient-text">Barriers</span></h1>
+        <p class="hero-subtitle">Translate text across 15 languages instantly with AI. Supports voice input, file upload, and speech output.</p>
+      </div>
+
+      <!-- Main Translator Card -->
+      <div class="translator-card" id="translatorCard">
+        <!-- Top controls -->
+        <div class="translator-controls">
+          <div class="lang-selector-wrap">
+            <label class="lang-label">From</label>
+            <select id="sourceLang" class="lang-select">
+              <option value="auto">🔍 Detect Language</option>
+            </select>
+          </div>
+          <button class="swap-btn" id="swapBtn" title="Swap languages" aria-label="Swap source and target languages">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4l4 4"/><path d="M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+          </button>
+          <div class="lang-selector-wrap">
+            <label class="lang-label">To</label>
+            <select id="targetLang" class="lang-select"></select>
+          </div>
+        </div>
+
+        <!-- Translation panels -->
+        <div class="panels">
+          <!-- Source panel -->
+          <div class="panel source-panel">
+            <div class="panel-header">
+              <span class="detected-lang" id="detectedLabel"></span>
+              <div class="panel-actions">
+                <button class="icon-btn" id="micBtn" title="Speak to translate" aria-label="Start voice input">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="22" x2="12" y2="17"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+                </button>
+                <button class="icon-btn" id="clearBtn" title="Clear text" aria-label="Clear input text">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+            </div>
+            <textarea id="sourceText" class="text-area" placeholder="Enter text to translate..." spellcheck="true" aria-label="Source text input" maxlength="5000"></textarea>
+            <div class="panel-footer">
+              <span class="char-count" id="charCount">0 / 5000</span>
+              <button class="btn btn-primary translate-btn" id="translateBtn">
+                <span class="btn-text">Translate</span>
+                <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Target panel -->
+          <div class="panel target-panel">
+            <div class="panel-header">
+              <span class="panel-title">Translation</span>
+              <div class="panel-actions">
+                <button class="icon-btn" id="ttsBtn" title="Listen to translation" aria-label="Play audio of translated text">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>
+                </button>
+                <button class="icon-btn" id="copyBtn" title="Copy translation" aria-label="Copy translated text">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                </button>
+                <button class="icon-btn" id="exportBtn" title="Export as .txt" aria-label="Export translated text as file">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </button>
+                <button class="icon-btn save-btn" id="saveBtn" title="Save to history" aria-label="Save translation to history">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="output-area" id="outputArea">
+              <div class="placeholder-msg" id="placeholderMsg">
+                <div class="placeholder-icon">🌍</div>
+                <p>Your translation will appear here</p>
+              </div>
+              <p id="translatedText" class="translated-output hidden"></p>
+              <div class="loading-dots hidden" id="loadingDots">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- File Upload -->
+        <div class="file-section">
+          <div class="file-drop-zone" id="fileDropZone" tabindex="0" role="button" aria-label="Upload file for translation">
+            <div class="file-drop-content">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p>Drop a file or <label for="fileInput" class="file-link">browse</label></p>
+              <span class="file-hint">Supports TXT, PDF, DOCX</span>
+            </div>
+            <input type="file" id="fileInput" accept=".txt,.pdf,.docx" hidden aria-label="File input" />
+          </div>
+          <div class="file-info hidden" id="fileInfo">
+            <span class="file-name" id="fileName"></span>
+            <button class="icon-btn" id="removeFileBtn" aria-label="Remove file">×</button>
+            <button class="btn btn-secondary" id="translateFileBtn">Translate File</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick language chips -->
+      <div class="quick-langs">
+        <span class="quick-label">Popular:</span>
+        <button class="lang-chip" data-lang="es">🇪🇸 Spanish</button>
+        <button class="lang-chip" data-lang="fr">🇫🇷 French</button>
+        <button class="lang-chip" data-lang="de">🇩🇪 German</button>
+        <button class="lang-chip" data-lang="zh">🇨🇳 Chinese</button>
+        <button class="lang-chip" data-lang="ja">🇯🇵 Japanese</button>
+        <button class="lang-chip" data-lang="ar">🇸🇦 Arabic</button>
+      </div>
+    </section>
+
+    <!-- ═══ DASHBOARD VIEW ═══ -->
+    <section id="dashboardView" class="view hidden">
+      <div class="dashboard-header">
+        <h2>Your Dashboard</h2>
+        <button class="btn btn-ghost" id="backHomeBtn">← Back to Translator</button>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Stats -->
+        <div class="stat-card">
+          <div class="stat-icon">📝</div>
+          <div>
+            <div class="stat-value" id="totalTranslations">0</div>
+            <div class="stat-label">Translations</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🔖</div>
+          <div>
+            <div class="stat-value" id="savedCount">0</div>
+            <div class="stat-label">Saved</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🌍</div>
+          <div>
+            <div class="stat-value" id="langsUsed">0</div>
+            <div class="stat-label">Languages Used</div>
+          </div>
+        </div>
+
+        <!-- History & Saved -->
+        <div class="dashboard-panel history-panel">
+          <div class="dp-header">
+            <h3>Translation History</h3>
+            <button class="btn btn-sm btn-danger" id="clearHistoryBtn">Clear All</button>
+          </div>
+          <div class="history-list" id="historyList">
+            <div class="empty-state">No translations yet. Start translating!</div>
+          </div>
+        </div>
+
+        <div class="dashboard-panel saved-panel">
+          <div class="dp-header">
+            <h3>Saved Translations</h3>
+          </div>
+          <div class="saved-list" id="savedList">
+            <div class="empty-state">No saved translations yet.</div>
+          </div>
+        </div>
+
+        <!-- Account Settings -->
+        <div class="dashboard-panel account-panel">
+          <div class="dp-header"><h3>Account Settings</h3></div>
+          <div class="account-info" id="accountInfo"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ───────────────── AUTH MODALS ───────────────── -->
+  <div class="modal-overlay hidden" id="authModalOverlay">
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+      <button class="modal-close" id="closeLoginModal" aria-label="Close">×</button>
+      <div class="modal-icon">🔐</div>
+      <h2>Welcome Back</h2>
+      <p class="modal-sub">Sign in to save your translation history</p>
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email" required />
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required />
+        </div>
+        <div class="form-error hidden" id="loginError"></div>
+        <button type="submit" class="btn btn-primary w-full">Login</button>
+      </form>
+      <p class="modal-switch">Don't have an account? <button class="link-btn" id="switchToRegister">Sign up</button></p>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal hidden" id="registerModal">
+      <button class="modal-close" id="closeRegisterModal" aria-label="Close">×</button>
+      <div class="modal-icon">🚀</div>
+      <h2>Create Account</h2>
+      <p class="modal-sub">Save your translations and more</p>
+      <form id="registerForm" novalidate>
+        <div class="form-group">
+          <label for="regName">Display Name</label>
+          <input type="text" id="regName" placeholder="Your name" autocomplete="name" required />
+        </div>
+        <div class="form-group">
+          <label for="regEmail">Email</label>
+          <input type="email" id="regEmail" placeholder="you@example.com" autocomplete="email" required />
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Password</label>
+          <input type="password" id="regPassword" placeholder="Min 6 characters" autocomplete="new-password" required minlength="6" />
+        </div>
+        <div class="form-error hidden" id="registerError"></div>
+        <button type="submit" class="btn btn-primary w-full">Create Account</button>
+      </form>
+      <p class="modal-switch">Already have an account? <button class="link-btn" id="switchToLogin">Login</button></p>
+    </div>
+  </div>
+
+  <!-- ───────────────── TOAST ───────────────── -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    // Configure PDF.js worker
+    if (typeof pdfjsLib !== 'undefined') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
